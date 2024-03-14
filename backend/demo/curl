@@ -1,4 +1,14 @@
+add
 curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"id":1,"title":"test title","description":"test description"}' \
   http://localhost:8080/api/v1/issues
+
+get
+curl  --header "Content-Type: application/json" http://localhost:8080/api/v1/issues/1
+
+update
+curl --header "Content-Type: application/json" \
+  --request PUT \
+  --data '{"id":1,"title":"test title update","description":"test description update"}' \
+  http://localhost:8080/api/v1/issues/1

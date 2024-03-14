@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 /**
  *
@@ -54,8 +57,51 @@ public class IssueV1Controller {
         response.setStatus("ok");
         response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());
        
-
         return new ResponseEntity<BaseResponse>(response, HttpStatus.OK);
 
+    }
+    
+    @GetMapping("/issues/{id}")
+    public ResponseEntity<? extends Object>  getIssue(@PathVariable Long id){
+        var issue = issueRepo.findById(id);
+        if(issue.isPresent()){
+            return new ResponseEntity<Issue>(issue.get(), HttpStatus.OK);
+        }
+        BaseResponse response = new BaseResponse();
+        response.setMessage("");
+        response.setStatus("not found");
+        response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());        
+        
+        return new ResponseEntity<BaseResponse>(response, HttpStatus.NOT_FOUND);
+    }
+    
+    @PutMapping("/issues/{id}")
+    public ResponseEntity<? extends Object>  updateIssue(@PathVariable Long id, @RequestBody Issue newIssue){
+        var oIssue = issueRepo.findById(id);
+        //if not found
+        if(!oIssue.isPresent()){
+            BaseResponse response = new BaseResponse();
+            response.setMessage("");
+            response.setStatus("not found");
+            response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());
+
+            return new ResponseEntity<BaseResponse>(response, HttpStatus.NOT_FOUND);
+        }
+        
+        //if exist update it
+        var issue = oIssue.get();
+        issue.setTitle(newIssue.getTitle());
+        issue.setDescription(newIssue.getDescription());
+
+        var saved = issueRepo.save(issue);
+
+        BaseResponse response = new BaseResponse();
+        response.setMessage("Success");
+        response.setData(saved);
+        response.setStatus("ok");
+        response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());
+
+        return new ResponseEntity<BaseResponse>(response, HttpStatus.OK);
+        
     }
 }
