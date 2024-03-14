@@ -1,0 +1,4 @@
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"id":1,"title":"test title","description":"test description"}' \
+  http://localhost:8080/api/v1/issues
