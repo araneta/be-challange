@@ -78,6 +78,18 @@ public class IssueV1Controller {
         return new ResponseEntity<BaseResponse>(response, HttpStatus.NOT_FOUND);
     }
     
+    @GetMapping("/issues")
+    public ResponseEntity<? extends Object>  getIssues(){
+        
+        BaseResponse response = new BaseResponse();
+        response.setMessage("Success");
+        response.setStatus("ok");
+        response.setData( issueRepo.findAll());
+        response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());        
+        
+        return new ResponseEntity<BaseResponse>(response, HttpStatus.OK);
+    }
+    
     @PutMapping("/issues/{id}")
     public ResponseEntity<? extends Object>  updateIssue(@PathVariable Long id, @RequestBody Issue newIssue){
         var oIssue = issueRepo.findById(id);
