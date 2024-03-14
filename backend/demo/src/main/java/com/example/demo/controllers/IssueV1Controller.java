@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -94,7 +95,14 @@ public class IssueV1Controller {
         issue.setDescription(newIssue.getDescription());
 
         var saved = issueRepo.save(issue);
-
+        
+        //log the object
+        try{
+            logger.info("updated issue: {}", objectMapper.writeValueAsString(saved));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        
         BaseResponse response = new BaseResponse();
         response.setMessage("Success");
         response.setData(saved);
@@ -103,5 +111,38 @@ public class IssueV1Controller {
 
         return new ResponseEntity<BaseResponse>(response, HttpStatus.OK);
         
+    }
+    
+    @DeleteMapping("/issues/{id}")
+    public ResponseEntity<? extends Object>  deleteIssue(@PathVariable Long id){
+        var oIssue = issueRepo.findById(id);
+        //if not found
+        if(!oIssue.isPresent()){
+            BaseResponse response = new BaseResponse();
+            response.setMessage("");
+            response.setStatus("not found");
+            response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());
+
+            return new ResponseEntity<BaseResponse>(response, HttpStatus.NOT_FOUND);
+        }
+        
+        //if exist delete it
+        var issue = oIssue.get();
+        issueRepo.delete(issue);
+        
+        //log the object
+        try{
+            logger.info("deleted issue: {}", objectMapper.writeValueAsString(issue));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        
+        BaseResponse response = new BaseResponse();
+        response.setMessage("Success");
+        response.setData(issue);
+        response.setStatus("ok");
+        response.setTime(TimeHelper.getCurrentTimeYYYYMMDDHHmmss());
+
+        return new ResponseEntity<BaseResponse>(response, HttpStatus.OK);
     }
 }
